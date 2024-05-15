@@ -7,7 +7,10 @@ import (
 	"log"
 	"os"
 
+	svg "github.com/ajstarks/svgo"
 	"github.com/skip2/go-qrcode"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func main() {
@@ -41,6 +44,25 @@ func main() {
 		desturl := fmt.Sprintf("%s/%s", baseurl, name)
 		outname := fmt.Sprintf("%s.png", name)
 		qrcode.WriteFile(desturl, qrcode.Medium, 256, outname)
+	}
+
+	csr := cases.Title(language.AmericanEnglish)
+	for _, name := range fileLines {
+		title := csr.String(name)
+		imagefile := fmt.Sprintf("%s.png", name)
+		outfile := fmt.Sprintf("%s.svg", name)
+
+		outwriter, err := os.Create(outfile)
+		if err != nil {
+			log.Fatalf("Creating SVG file: %v", err)
+		}
+		canvas := svg.New(outwriter)
+
+		canvas.Start(256, 300)
+		canvas.Title(fmt.Sprintf("QR Code for %s", title))
+		canvas.Image(0, 0, 256, 256, imagefile)
+		canvas.Text(128, 257, title, "text-anchor: middle; color: black; font-family: Arial; font-size: 10pt")
+		canvas.End()
 	}
 
 }

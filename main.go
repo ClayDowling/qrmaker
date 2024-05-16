@@ -15,6 +15,10 @@ import (
 	"golang.org/x/text/language"
 )
 
+const DPI = 96
+const CARDHEIGHT = 2
+const CARDWIDTH = 3.5
+
 func main() {
 	var srcfile string
 	var baseurl string
@@ -69,13 +73,16 @@ func main() {
 			cardText += baseText
 		}
 
-		cardLines := strings.Split(wordwrap.String(cardText, 14), "\n")
+		cardLines := strings.Split(wordwrap.String(cardText, 18), "\n")
 
-		canvas.Startunit(3, 2, "in", "style=\"font-family: Arial\"")
+		qrWidth := int(1.5 * DPI)
+		qrX := int(CARDWIDTH*DPI) - qrWidth
+
+		canvas.Start(int(3.5*DPI), 2*DPI, "style=\"font-family: Arial\"")
 		canvas.Title(fmt.Sprintf("QR Code for %s", title))
-		canvas.Image(144, 0, 144, 144, imagefile)
-		canvas.Textlines(4, 28, cardLines, 20, 24, "black", "start")
-		canvas.Text(216, 160, name, "text-anchor: middle; color: black; font-family: Arial; font-size: 10pt")
+		canvas.Image(qrX, 0, qrWidth, int(qrWidth), imagefile)
+		canvas.Textlines(24, 32, cardLines, 20, 24, "black", "start")
+		canvas.Text(qrX+int(qrWidth/2.0), qrWidth+18, name, "text-anchor: middle; color: black; font-family: Arial; font-size: 10pt")
 		canvas.End()
 	}
 
